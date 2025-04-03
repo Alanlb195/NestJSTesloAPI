@@ -1,6 +1,7 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ProductImage } from "./product-image.entity";
 
-@Entity()
+@Entity({ name: 'products' })
 export class Product {
 
     @PrimaryGeneratedColumn('uuid')
@@ -49,7 +50,13 @@ export class Product {
 
     // tags
 
-    // images
+    // images, one to many relation
+    @OneToMany(
+        () => ProductImage, // Entity relacionated
+        (productImage) => productImage.product, // return inverse property
+        { cascade: true } // insert/delete/update on cascade
+    )
+    images?: ProductImage[]; // inverse property
 
     @BeforeInsert()
     checkSlugInsert() {
