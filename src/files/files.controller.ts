@@ -6,7 +6,9 @@ import { diskStorage } from 'multer';
 import { fileNamer, fileFilter } from 'src/common/helpers';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
 
@@ -17,6 +19,13 @@ export class FilesController {
 
 
   @Get('product/:imageName')
+  @ApiResponse({ status: 200, description: 'Return image URL' })
+  @ApiParam({
+    name: 'imageName',
+    description: 'Nombre del archivo de imagen',
+    type: String,
+    example: 'example.jpg',
+  })
   findProductImage(
     @Param('imageName') imageName: string,
     @Res() res: Response
@@ -30,6 +39,7 @@ export class FilesController {
 
 
   @Post('product')
+  @ApiResponse({ status: 200, description: 'Return image URL' })
   @UseInterceptors(FileInterceptor('file', {
     fileFilter: fileFilter,
     // limits: { fieldSize: 100 } // limit of size
