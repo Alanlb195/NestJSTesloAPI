@@ -22,6 +22,8 @@
 - Dockerized PostgreSQL database
 - Environment configuration
 - Data validation
+- WebSocket support for real-time messaging
+
 
 ## Quick Start
 
@@ -89,10 +91,23 @@ Send a GET request to:
 ```
 GET http://localhost:3000/api/seed
 ```
+
+### WebSocket Support
+The project includes WebSocket support using @nestjs/websockets and socket.io. Upon connection, the WebSocket server:
+
+Receives the user's JWT token.
+
+Validates the token using the authentication module.
+
+Confirms the user is active.
+
+Registers the user as a connected client.
+
+Clients can send and receive real-time messages. Messages are not persisted; they are only broadcast to connected users in real-time.
+
 #### Tech Stack
 - Framework: NestJS
 - Database: PostgreSQL
 - ORM: TypeORM
 - Containerization: Docker
 - Package Manager: Yarn
-

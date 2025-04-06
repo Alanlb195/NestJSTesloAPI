@@ -6,7 +6,7 @@ import { diskStorage } from 'multer';
 import { fileNamer, fileFilter } from 'src/common/helpers';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
-import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Files')
 @Controller('files')
@@ -19,10 +19,10 @@ export class FilesController {
 
 
   @Get('product/:imageName')
-  @ApiResponse({ status: 200, description: 'Return image URL' })
+  @ApiResponse({ status: 200, description: 'Return image' })
   @ApiParam({
     name: 'imageName',
-    description: 'Nombre del archivo de imagen',
+    description: 'Image file url (complete)',
     type: String,
     example: 'example.jpg',
   })
@@ -39,8 +39,29 @@ export class FilesController {
 
 
   @Post('product')
-  @ApiResponse({ status: 200, description: 'Return image URL' })
-  @UseInterceptors(FileInterceptor('file', {
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Image file',
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Secure image URL',
+    schema: {
+      example: {
+        secureUrl: 'http://localhost:3000/files/product/example.jpg',
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: "Invalid image file, accepted extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp']" }) @UseInterceptors(FileInterceptor('file', {
     fileFilter: fileFilter,
     // limits: { fieldSize: 100 } // limit of size
     storage: diskStorage({
