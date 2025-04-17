@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, UseGuards, Headers, SetMetadata, } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Headers, SetMetadata, Req, } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, CreateUserDto } from './dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -35,12 +35,12 @@ export class AuthController {
   }
 
   @Get('private')
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard(ValidRoles.admin)) // custom decorator, you can use custom roles to manage permissions
   testingPrivateRoute(
+    @Req() request: Express.Request, // * all of the request...
     @GetUser() user: User,
     @GetUser('email') userEmail: string,
-    // @Req() request: Express.Request, // * all of the request...
-    // @GetRawHeaders() rawHeaders: string[], // * to get headers with a custom decorator
+    @GetRawHeaders() rawHeaders: string[], // * to get headers with a custom decorator
     @Headers() headers: IncomingHttpHeaders // * to get headers by nestjs 
   ) {
     // console.log({ user: request });
@@ -49,7 +49,7 @@ export class AuthController {
       message: 'hola mundo private',
       user,
       email: userEmail,
-      // rawHeaders,
+      rawHeaders,
       headers
     }
   }

@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsOptional, IsPositive, Min } from "class-validator";
+import { IsIn, IsOptional, IsPositive, Min } from "class-validator";
 
 
 export class PaginationDto {
@@ -19,8 +19,16 @@ export class PaginationDto {
         description: 'How many rows do you want to skip'
     })
     @IsOptional()
-    @IsPositive()
+    @Min(0)
     @Type(() => Number)
     offset?: number;
+
+    @ApiProperty({
+        default: null,
+        description: 'Specific gender to search'
+    })
+    @IsOptional()
+    @IsIn(['men', 'women', 'unisex', 'kid'])
+    gender: 'men' | 'women' | 'unisex' | 'kid'
 
 }

@@ -1,15 +1,13 @@
-import { createParamDecorator, ExecutionContext, InternalServerErrorException } from "@nestjs/common";
+import { createParamDecorator, ExecutionContext, InternalServerErrorException } from '@nestjs/common';
 
+export const getRawHeadersHandler = (data: unknown, ctx: ExecutionContext) => {
+  const req = ctx.switchToHttp().getRequest();
+  const headers = req.rawHeaders;
 
-export const GetRawHeaders = createParamDecorator(
-    (data, ctx: ExecutionContext) => {
+  if (!headers)
+    throw new InternalServerErrorException('Headers not found (request)');
 
-        const req = ctx.switchToHttp().getRequest();
-        const headers = req.rawHeaders;
+  return headers;
+};
 
-        if (!headers)
-            throw new InternalServerErrorException('Headers not found (request)')
-
-        return headers
-    }
-);
+export const GetRawHeaders = createParamDecorator(getRawHeadersHandler);

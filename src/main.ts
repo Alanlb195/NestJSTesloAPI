@@ -5,7 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 
-async function bootstrap() {
+export async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 
@@ -17,17 +17,19 @@ async function bootstrap() {
     })
   );
 
+  app.enableCors();
+
   // swagger config
   const config = new DocumentBuilder()
     .setTitle('Teslo RESTful API')
     .setDescription('Teslo shop API')
     .setVersion('1.0')
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  const documentFactory = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-  await app.listen(process.env.PORT, () => {
-    logger.log(`App running on port ${process.env.PORT}`)
-  });
+  const PORT = process.env.PORT ?? 3000;
+  await app.listen(PORT);
+  logger.log(`App running on port ${PORT}`)
 }
 bootstrap();
