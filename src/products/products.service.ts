@@ -59,15 +59,25 @@ export class ProductsService {
       relations: {
         images: true
       },
-      where: {
-        gender: gender
-      }
+      order: {
+        id: 'ASC'
+      },
+      where: gender ? [{ gender }, { gender: 'unisex' }] : {},
     });
 
-    return products.map(({ images, ...rest }) => ({
-      ...rest,
-      images: images.map(img => img.url)
-    }));
+    const totalProduct = await this.productRepository.count({
+      where: gender ? [{ gender }, { gender: 'unisex' }] : {},
+    })
+
+    return {
+      count: totalProduct,
+      pages: Math.ceil(totalProduct / limit),
+      products: products.map(({ images, ...rest }) => ({
+        ...rest,
+        images: images.map(img => img.url)
+      }))
+    }
+
   }
 
   async findOne(term: string) {
@@ -135,14 +145,15 @@ export class ProductsService {
       await queryRunner.manager.save(product);
 
       await queryRunner.commitTransaction();
-      await queryRunner.release();
-
       return this.findOnePlain(id);
+
     }
     catch (error) {
       await queryRunner.rollbackTransaction();
-      await queryRunner.release();
       this.handleDbExceptions(error);
+    }
+    finally {
+      await queryRunner.release();
     }
 
   }
